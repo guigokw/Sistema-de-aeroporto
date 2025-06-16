@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 public class Aeronave {
     private String modelo;
-    private int capacidadeMaxima;
+    private long capacidadeMaxima;
     private int numeroRegistro;
 
     Map<Integer, Voo> voosDaAeronave = new LinkedHashMap<>();
@@ -11,7 +11,7 @@ public class Aeronave {
     Set<Integer> numRegistro = new HashSet<>();
     Scanner input = new Scanner(System.in);
 
-    public Aeronave(String modelo, int capacidadeMaxima, int numeroRegistro) throws NumeroRegistroInvalidoException, IllegalArgumentException, CapacidadeMaximaInvalida {
+    public Aeronave(String modelo, long capacidadeMaxima, int numeroRegistro) throws NumeroRegistroInvalidoException, IllegalArgumentException, CapacidadeMaximaInvalida {
         if (numeroRegistro <= 0) {
             throw new NumeroRegistroInvalidoException("nao foi possivel cadastrar aeronave, pois o numero de registro esta invalido");
         } else if (modelo.isEmpty()) {
@@ -37,11 +37,11 @@ public class Aeronave {
         }
     }
 
-    public int getCapacidadeMaxima() {
+    public long getCapacidadeMaxima() {
         return capacidadeMaxima;
     }
 
-    public void setCapacidadeMaxima(int capacidadeMaxima) throws CapacidadeMaximaInvalida {
+    public void setCapacidadeMaxima(long capacidadeMaxima) throws CapacidadeMaximaInvalida {
         if (capacidadeMaxima <= 0 || capacidadeMaxima > 850) {
             throw new CapacidadeMaximaInvalida("não foi possivel cadastrar aeronave pois a capacidade maxima esta invalida, sendo menor que 0 ou maior que 850");
         } else {

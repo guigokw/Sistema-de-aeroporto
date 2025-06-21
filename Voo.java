@@ -12,7 +12,7 @@ public class Voo {
     private StatusVoo statusVoo;
     private Aeronave aeronaveAssociada;
 
-    Map<String, Passageiros> passageirosNoVoo = new LinkedHashMap<>();
+    Map<Integer, Passagem> passageirosNoVoo = new LinkedHashMap<>();
     Scanner input = new Scanner(System.in);
 
     public Voo(int numeroVoo, String origemVoo, String destinoVoo, LocalDateTime dataHorarioPartida, LocalDateTime dataHorarioChegada, StatusVoo statusVoo, Aeronave aeronaveAssociada) throws IllegalArgumentException {

@@ -114,7 +114,7 @@ public class Aeroporto {
         }
     }
 
-    public void associarVooAeronave(Voo voo) throws NumeroVooDuplicadoException {
+    private void associarVooAeronave(Voo voo) throws NumeroVooDuplicadoException {
         if (!numVoo.add(voo.getNumeroVoo())) {
             throw new NumeroVooDuplicadoException("nao foi possivel associar o voo com a aeronave pois o numero de voo esta duplicado");
         } else {
@@ -278,7 +278,7 @@ public class Aeroporto {
         }
     }
 
-    public void verificrDisponibilidadeAeronave() throws VooNaoEncontradoException {
+    private void verificarDisponibilidadeAeronave() throws VooNaoEncontradoException {
         System.out.print("qual o numero voo vc deseja verificar a disponibilidade de assento?");
         int num = input.nextInt();
 
@@ -297,7 +297,10 @@ public class Aeroporto {
         System.out.print("qual o cpf do passageiro?");
         String cpfPassageiro = input.nextLine().trim();
 
-        Passageiros passageiro = new Passageiros(nomePassageiro, cpfPassageiro.replaceAll("[\\d]", ""));
+        System.out.print("qual o numero do passaporte do passageiro?");
+        String numeroPassaporte = input.nextLine().trim();
+
+        Passageiros passageiro = new Passageiros(nomePassageiro, cpfPassageiro.replaceAll("\\d", ""), numeroPassaporte.replaceAll("\\d", ""));
 
         if (!cpf.add(passageiro.getCpfPassageiro())) {
             throw new CpfDuplicadoException("não foi possivel adicionar o passageiro a lista de passageiros, pois o cpf esta duplicado");
@@ -344,17 +347,21 @@ public class Aeroporto {
         }
     }
 
-    public void consultarInformacoesPassageiro() {
-        System.out.print("qual o cpf do passageiro que vc deseja consultar infromacoes?");
-        String cpf = input.nextLine();
+    public void consultarInformacoesPassageiro() throws PassageiroNaoEncontradoException {
+        if (passageirosCadastrados.isEmpty()) {
+            System.out.println("não foi possivel consultar as informações de um passageiro pois nenhum foi encontrado");
+        } else {
+            System.out.print("qual o cpf do passageiro que vc deseja consultar infromacoes?");
+            String cpf = input.nextLine();
 
-        Passageiros passageiro = passageirosCadastrados.values().stream()
-                .filter(a -> a.getCpfPassageiro().equalsIgnoreCase(cpf))
-                .findFirst()
-                .orElseThrow(() -> new PassageiroNaoEncontradoException("não foi possivel consultar as informações do passageiro, pois ele não foi encontrado"));
+            Passageiros passageiro = passageirosCadastrados.values().stream()
+                    .filter(a -> a.getCpfPassageiro().equalsIgnoreCase(cpf))
+                    .findFirst()
+                    .orElseThrow(() -> new PassageiroNaoEncontradoException("não foi possivel consultar as informações do passageiro, pois ele não foi encontrado"));
 
-        System.out.println("===== DETALHES DO PASSAGEIRO =====");
-        passageiro.exibirDetalhesPassageiro();
+            System.out.println("===== DETALHES DO PASSAGEIRO =====");
+            passageiro.exibirDetalhesPassageiro();
+        }
     }
 
     // MENU DE PASSAGEIRO
@@ -377,10 +384,38 @@ public class Aeroporto {
                 .findFirst()
                 .orElseThrow(() -> new VooNaoEncontradoException("não foi possivel o passageiro embarcar no voo pois o numero do voo não foi encontrado |OU| o voo ja passou do agendamento"));
 
-        verificrDisponibilidadeAeronave();
+        verificarDisponibilidadeAeronave();
 
+        System.out.print("qual o numero da passagem?");
+        int numeroPassagem = input.nextInt();
+
+        Passagem passagem = new Passagem(numeroPassagem, passageiro, voo);
         passageiro.passageirosVoosCadastrados.add(voo);
-        voo.passageirosNoVoo.put(passageiro.getCpfPassageiro(), passageiro);
+        passageiro.passagensDoPassageiro.add(passagem);
         System.out.println("passageiro " +passageiro.getNomePassageiro()+ " registrado no voo " +voo.getNumeroVoo()+ " com destino a " +voo.getDestinoVoo());
+    }
+
+    public void realizarEmbarque() {
+        System.out.print("qual o numero da passagem?");
+        int numPassagem = input.nextInt();
+
+        input.nextLine();
+
+        System.out.print("qual o numero do passaporte?");
+        String numPassaporte = input.nextLine();
+
+        Passageiros passageiro = passageirosCadastrados.values().stream()
+                .filter(a -> a.getNumeroPassaporte().equalsIgnoreCase(numPassaporte))
+                .findFirst()
+                .orElseThrow(() -> new PassageiroNaoEncontradoException("não foi possivel realizar embarque pois nenhum passageiro foi encontrado com esse numero de passaporte"));
+
+        Passagem passagem = passageiro.passagensDoPassageiro.stream()
+                .filter(a -> a.getNumeroPassagem() == numPassagem)
+                .filter(b -> b.getVooPassagem().getStatusVoo() == StatusVoo.EMBARCANDO)
+                .filter(c -> c.getPassageiro().getNumeroPassaporte().equalsIgnoreCase(passageiro.getNumeroPassaporte()))
+                .findFirst()
+                .orElseThrow(() -> new PassagemNaoEncontradaException("não foi possivel realizar embarque pois o numero da passagem não foi encontrado |OU| o voo ja não esta mais embarcando |OU| o numero da passagem fornecida não corresponde ao passageiro fornecido"));
+
+        passagem.getVooPassagem().passageirosNoVoo.put(passagem.getNumeroPassagem(), passagem);
     }
 }

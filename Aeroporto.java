@@ -1,4 +1,6 @@
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -14,44 +16,58 @@ public class Aeroporto {
 
     // MENU DE ADMINISTRACAO
 
-    public void cadastrarAeronaveAeroporto() throws NumeroRegistroInvalidoException {
-        System.out.print("qual o numero de registro da aeronave?");
-        int numeroRegistro = input.nextInt();
+    public void cadastrarAeronaveAeroporto() throws NumeroRegistroDuplicadoException {
+        try {
+            System.out.print("qual o numero de registro da aeronave?");
+            int numeroRegistro = input.nextInt();
 
-        input.nextLine();
+            input.nextLine();
 
-        System.out.print("qual o modelo da aeronave que vc deseja cadastrar?");
-        String modelo = input.nextLine();
+            System.out.print("qual o modelo da aeronave que vc deseja cadastrar?");
+            String modelo = input.nextLine();
 
-        System.out.print("qual a capacidade maxima dessa aeronave?");
-        long capacidadeMaxima = input.nextLong();
+            System.out.print("qual a capacidade maxima dessa aeronave?");
+            long capacidadeMaxima = input.nextLong();
 
-        Aeronave aeronave = new Aeronave(modelo, capacidadeMaxima, numeroRegistro);
+            Aeronave aeronave = new Aeronave(modelo, capacidadeMaxima, numeroRegistro);
 
-        if (!numRegistro.add(numeroRegistro)) {
-            throw new NumeroRegistroDuplicadoException("Não foi possivel cadastrar a aeronave pois o numero de registro esta duplicado");
-        } else {
-            aeronaves.put(aeronave.getNumeroRegistro(), aeronave);
-            numRegistro.add(aeronave.getNumeroRegistro());
-            System.out.println("Aeronave do modelo " + aeronave.getModelo() + " do numero " + aeronave.getNumeroRegistro() + " foi registrada no sistema");
+            if (!numRegistro.add(numeroRegistro)) {
+                throw new NumeroRegistroDuplicadoException("Não foi possivel cadastrar a aeronave pois o numero de registro esta duplicado");
+            } else {
+                aeronaves.put(aeronave.getNumeroRegistro(), aeronave);
+                numRegistro.add(aeronave.getNumeroRegistro());
+                System.out.println("Aeronave do modelo " + aeronave.getModelo() + " do numero " + aeronave.getNumeroRegistro() + " foi registrada no sistema");
+            }
+        } catch (NumeroRegistroDuplicadoException e) {
+            System.out.println(e.getMessage());
+        } catch (java.util.InputMismatchException e) {
+            System.out.println("entrada invalida, por favor digite novamente");
+            input.nextLine();
         }
     }
 
     public void removerAeronaveAeroporto() throws AeronaveNaoEncontradaException {
-        if (aeronaves.isEmpty()) {
-            System.out.println("não foi possivel remover uma aeronave pois não há nenhuma cadastrada");
-        } else {
-            System.out.print("qual o numero de registro da aeronave que vc deseja remover do sistema");
-            int num = input.nextInt();
+        try {
+            if (aeronaves.isEmpty()) {
+                System.out.println("não foi possivel remover uma aeronave pois não há nenhuma cadastrada");
+            } else {
+                System.out.print("qual o numero de registro da aeronave que vc deseja remover do sistema");
+                int num = input.nextInt();
 
-            Aeronave aeronave = aeronaves.values().stream()
-                    .filter(a -> a.getNumeroRegistro() == num)
-                    .findFirst()
-                    .orElseThrow(() -> new AeronaveNaoEncontradaException("nao foi possivel remover a aeronave, pois ela não foi encontrada"));
+                Aeronave aeronave = aeronaves.values().stream()
+                        .filter(a -> a.getNumeroRegistro() == num)
+                        .findFirst()
+                        .orElseThrow(() -> new AeronaveNaoEncontradaException("nao foi possivel remover a aeronave, pois ela não foi encontrada"));
 
-            aeronaves.remove(aeronave.getNumeroRegistro(), aeronave);
-            numRegistro.remove(aeronave.getNumeroRegistro());
-            System.out.println("Aeronave do numero " + aeronave.getNumeroRegistro() + " removido do sistema");
+                aeronaves.remove(aeronave.getNumeroRegistro(), aeronave);
+                numRegistro.remove(aeronave.getNumeroRegistro());
+                System.out.println("Aeronave do numero " + aeronave.getNumeroRegistro() + " removido do sistema");
+            }
+        } catch (AeronaveNaoEncontradaException e) {
+            System.out.println(e.getMessage());
+        } catch (java.util.InputMismatchException e) {
+            System.out.println("entrada invalida, por favor digite novamente");
+            input.nextLine();
         }
     }
 
@@ -75,11 +91,23 @@ public class Aeroporto {
 
             input.nextLine();
 
-            System.out.print("qual a origem do voo?");
-            String origemVoo = input.nextLine();
+            System.out.println("1 - são paulo");
+            System.out.println("2 - rio de janeiro");
+            System.out.println("3 - florianopolis");
+            System.out.println("4 - goias");
+            System.out.println("5 - belo horizonte");
+            System.out.println("----------------------");
+            System.out.print("qual desses destinos o voo seguirá");
+            int opcao = input.nextInt();
 
-            System.out.print("qual o destino do voo?");
-            String destinoVoo = input.nextLine();
+            Localidade destinoVoo = switch (opcao) {
+                case 1 -> Localidade.SAO_PAULO;
+                case 2 -> Localidade.RIO_DE_JANEIRO;
+                case 3 -> Localidade.FLORIANOPOLIS;
+                case 4 -> Localidade.GOIAS;
+                case 6 -> Localidade.BELO_HORIZONTE;
+                default -> throw new IllegalArgumentException("opcao invalida, por favor digite novamente");
+            };
 
             System.out.print("qual a data e o horario de partida?");
             String dataHorarioPartida = input.nextLine().trim();
@@ -101,7 +129,7 @@ public class Aeroporto {
                     .findFirst()
                     .orElseThrow(() -> new AeronaveNaoEncontradaException("não foi possivel cadastrar voo, pois não há nenhuma aeronave cadastrada no aeroporto"));
 
-            Voo voo = new Voo(numeroVoo, origemVoo, destinoVoo, dataConvertidaPartida, dataConvertidaChegada, StatusVoo.AGENDADO, aeronave);
+            Voo voo = new Voo(numeroVoo, "VITORIA", destinoVoo, dataConvertidaPartida, dataConvertidaChegada, StatusVoo.AGENDADO, aeronave);
 
             if (!numVoo.add(voo.getNumeroVoo())) {
                 throw new VooDuplicadoException("não foi possivel cadastrar voo pois o numero de voo esta duplicado");
@@ -367,6 +395,11 @@ public class Aeroporto {
     // MENU DE PASSAGEIRO
 
     public void realizarCheckIn() throws PassageiroNaoEncontradoException, VooNaoEncontradoException, VagasIndisponiveisException {
+        double precoPassagem;
+        double precoDistancia;
+        double precoDia;
+        double precoHora;
+
         System.out.print("informe o seu cpf:");
         String cpf = input.nextLine().trim();
 
@@ -389,7 +422,41 @@ public class Aeroporto {
         System.out.print("qual o numero da passagem?");
         int numeroPassagem = input.nextInt();
 
-        Passagem passagem = new Passagem(numeroPassagem, passageiro, voo);
+        if (voo.getDestinoVoo().getDistancia() < 600) {
+            precoDistancia = 41.89;
+        } else if (voo.getDestinoVoo().getDistancia() < 1200) {
+            precoDistancia = 60.87;
+        } else {
+            precoDistancia = 79.49;
+        }
+
+        DayOfWeek dia = voo.getDataHorarioPartida().getDayOfWeek();
+
+        if (dia.getValue() == 2 || dia.getValue() == 3 || dia.getValue() == 4) {
+            precoDia = 19.99;
+        } else if (dia.getValue() == 6 || dia.getValue() == 7 || dia.getValue() == 5) {
+            precoDia = 35.85;
+        } else {
+            precoDia = 23.94;
+        }
+
+        int horaVoo = voo.getDataHorarioPartida().getHour();
+
+        if (horaVoo >= 17 && horaVoo <= 21) {
+            precoHora = 50;
+        } else if (horaVoo > 0 && horaVoo <= 6) {
+            precoHora = 22;
+        } else if (horaVoo > 6 && horaVoo <= 13) {
+            precoHora = 34;
+        } else if (horaVoo > 13 && horaVoo < 17) {
+            precoHora = 41;
+        } else {
+            precoHora = 28;
+        }
+
+        precoPassagem = precoDia + precoDistancia + precoHora;
+
+        Passagem passagem = new Passagem(numeroPassagem, passageiro, voo, precoPassagem);
         passageiro.passageirosVoosCadastrados.add(voo);
         passageiro.passagensDoPassageiro.add(passagem);
         System.out.println("passageiro " +passageiro.getNomePassageiro()+ " registrado no voo " +voo.getNumeroVoo()+ " com destino a " +voo.getDestinoVoo());
@@ -417,5 +484,45 @@ public class Aeroporto {
                 .orElseThrow(() -> new PassagemNaoEncontradaException("não foi possivel realizar embarque pois o numero da passagem não foi encontrado |OU| o voo ja não esta mais embarcando |OU| o numero da passagem fornecida não corresponde ao passageiro fornecido"));
 
         passagem.getVooPassagem().passageirosNoVoo.put(passagem.getNumeroPassagem(), passagem);
+    }
+
+    public void consultarSeusVoos() {
+        if (passageirosCadastrados.isEmpty()) {
+            System.out.println("não foi possivel consultar voos, pois não há nenhum passageiro cadastrado");
+        } else {
+            System.out.print("qual o numero do seu passaporte?");
+            String numPassaporte = input.nextLine();
+
+            Passageiros passageiro = passageirosCadastrados.values().stream()
+                    .filter(a -> a.getNumeroPassaporte().equalsIgnoreCase(numPassaporte))
+                    .findFirst()
+                    .orElseThrow(() -> new PassaporteNaoEncontradoException("não foi possivel consultar seus voos, pois seu passaporte não foi encontrado no sistema"));
+
+            System.out.println("===== DETALHES DO PASSAGEIRO =====");
+            passageiro.exibirDetalhesPassageiro();
+
+            System.out.println("1 - sim");
+            System.out.println("2 - não");
+            System.out.print("esse é o seu perfil?");
+            int opcao = input.nextInt();
+
+            switch (opcao) {
+                case 1:
+                    if (passageiro.passageirosVoosCadastrados.isEmpty()) {
+                        System.out.println("você não foi registrado em nenhum voo");
+                    } else {
+                        System.out.println("===== DETALHES DOS VOOS DO PASSAGEIRO " +passageiro.getNomePassageiro().toUpperCase()+ " =====");
+                        for (Voo voos : passageiro.passageirosVoosCadastrados) {
+                            voos.exibirDetalhesVoo();
+                        }
+                    }
+                    break;
+                case 2:
+                    System.out.println("se vc deseja consultar seus voos corretamente, por favor tente realizar a operação novamente");
+                    break;
+                default:
+                    System.out.println("opcao invalida, por favor digite novamente");
+            }
+        }
     }
 }

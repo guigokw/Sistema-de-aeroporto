@@ -10,16 +10,23 @@ public class Aeronave {
     Scanner input = new Scanner(System.in);
 
     public Aeronave(String modelo, long capacidadeMaxima, int numeroRegistro) throws NumeroRegistroInvalidoException, IllegalArgumentException, CapacidadeMaximaInvalida {
-        if (numeroRegistro <= 0) {
-            throw new NumeroRegistroInvalidoException("nao foi possivel cadastrar aeronave, pois o numero de registro esta invalido");
-        } else if (modelo.isEmpty()) {
-            throw new IllegalArgumentException("nao foi possivel cadastrar aeronave pois o modelo esta nulo");
-        } else if (capacidadeMaxima <= 0 || capacidadeMaxima > 850) {
-            throw new CapacidadeMaximaInvalida("não foi possivel cadastrar aeronave pois a capacidade maxima esta invalida, sendo menor que 0 ou maior que 850");
-        } else {
-            this.modelo = modelo;
-            this.capacidadeMaxima = capacidadeMaxima;
-            this.numeroRegistro = numeroRegistro;
+        try {
+            if (numeroRegistro <= 0) {
+                throw new NumeroRegistroInvalidoException("nao foi possivel cadastrar aeronave, pois o numero de registro esta invalido");
+            } else if (modelo.isEmpty()) {
+                throw new IllegalArgumentException("nao foi possivel cadastrar aeronave pois o modelo esta nulo");
+            } else if (capacidadeMaxima <= 0 || capacidadeMaxima > 850) {
+                throw new CapacidadeMaximaInvalida("não foi possivel cadastrar aeronave pois a capacidade maxima esta invalida, sendo menor que 0 ou maior que 850");
+            } else {
+                this.modelo = modelo;
+                this.capacidadeMaxima = capacidadeMaxima;
+                this.numeroRegistro = numeroRegistro;
+            }
+        } catch (NumeroRegistroInvalidoException | IllegalArgumentException| CapacidadeMaximaInvalida e) {
+            System.out.println(e.getMessage());
+        } catch (java.util.InputMismatchException e) {
+            System.out.println("entrada invalida, por favor digite novamente");
+            input.nextLine();
         }
     }
 

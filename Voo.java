@@ -1,12 +1,11 @@
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Scanner;
 
 public class Voo {
     private int numeroVoo;
     private String origemVoo;
-    private String destinoVoo;
+    private Localidade destinoVoo;
     private LocalDateTime dataHorarioPartida;
     private LocalDateTime dataHorarioChegada;
     private StatusVoo statusVoo;
@@ -15,14 +14,14 @@ public class Voo {
     Map<Integer, Passagem> passageirosNoVoo = new LinkedHashMap<>();
     Scanner input = new Scanner(System.in);
 
-    public Voo(int numeroVoo, String origemVoo, String destinoVoo, LocalDateTime dataHorarioPartida, LocalDateTime dataHorarioChegada, StatusVoo statusVoo, Aeronave aeronaveAssociada) throws IllegalArgumentException {
+    public Voo(int numeroVoo, String origemVoo, Localidade destinoVoo, LocalDateTime dataHorarioPartida, LocalDateTime dataHorarioChegada, StatusVoo statusVoo, Aeronave aeronaveAssociada) throws IllegalArgumentException {
         if (numeroVoo <= 0) {
             throw new IllegalArgumentException("nao foi possivel cadastrar voo pois o numero de voo esta invalido");
-        } else if (origemVoo.isEmpty() || destinoVoo.isEmpty()) {
+        } else if (origemVoo.isEmpty()) {
             throw new IllegalArgumentException("nao foi possivel cadastrar voo pois ou a origem ou a chegada do voo estão vazias");
         } else {
             this.numeroVoo = numeroVoo;
-            this.origemVoo = origemVoo;
+            this.origemVoo = "VITORIA";
             this.destinoVoo = destinoVoo;
             this.dataHorarioPartida = dataHorarioPartida;
             this.dataHorarioChegada = dataHorarioChegada;
@@ -55,16 +54,12 @@ public class Voo {
         }
     }
 
-    public String getDestinoVoo() {
+    public Localidade getDestinoVoo() {
         return destinoVoo;
     }
 
-    public void setDestinoVoo(String destinoVoo) throws IllegalArgumentException {
-        if (destinoVoo.isEmpty()) {
-            throw new IllegalArgumentException("não foi possivel alterar o destino do voo pois nada foi escrito");
-        } else {
-            this.destinoVoo = destinoVoo;
-        }
+    public void setDestinoVoo(Localidade destinoVoo) {
+        this.destinoVoo = destinoVoo;
     }
 
     public LocalDateTime getDataHorarioPartida() {

@@ -12,15 +12,19 @@ public class Passageiros {
     Scanner input = new Scanner(System.in);
 
     public Passageiros(String nomePassageiro, String cpfPassageiro, String numeroPassaporte) throws IllegalArgumentException, CpfInvalidoException {
-        if (nomePassageiro.isEmpty()) {
-            throw new IllegalArgumentException("não foi possivel cadastrar o passageiro pois o nome esta nulo");
-        } else if (cpfPassageiro.length() != 11) {
-            throw new CpfInvalidoException("não foi possivel cadastrar o passageiro pois o cpf é invalido");
-        } else if (numeroPassaporte.length() != 6) {
-            throw new PassaporteInvalidoException("não foi possivel cadastrar o passageiro pois o seu numero de passaporte esta invalido");
-        } else {
-            this.nomePassageiro = nomePassageiro;
-            this.cpfPassageiro = cpfPassageiro;
+        try {
+            if (nomePassageiro.isEmpty()) {
+                throw new IllegalArgumentException("não foi possivel cadastrar o passageiro pois o nome esta nulo");
+            } else if (cpfPassageiro.length() != 11) {
+                throw new CpfInvalidoException("não foi possivel cadastrar o passageiro pois o cpf é invalido");
+            } else if (numeroPassaporte.length() != 6) {
+                throw new PassaporteInvalidoException("não foi possivel cadastrar o passageiro pois o seu numero de passaporte esta invalido");
+            } else {
+                this.nomePassageiro = nomePassageiro;
+                this.cpfPassageiro = cpfPassageiro;
+            }
+        } catch (IllegalArgumentException | CpfInvalidoException | PassaporteInvalidoException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -63,6 +67,7 @@ public class Passageiros {
     public void exibirDetalhesPassageiro() {
         System.out.println("NOME DO PASSAGEIRO: " +this.nomePassageiro);
         System.out.println("CPF DO PASSAGEIRO: " +this.cpfPassageiro);
+        System.out.println("NUMERO DO PASSAPORTE: " +this.numeroPassaporte);
         System.out.println("-----------------------");
     }
 }

@@ -27,20 +27,21 @@ public class Main {
 
         while (true) {
             try {
+                System.out.println("===== SISTEMA DO AEROPORTO =====");
                 System.out.println("[1] - MENU ADMINISTRATIVO");
                 System.out.println("[2]- MENU DO PASSAGEIRO");
                 System.out.println("[3] - MENU DE RELATORIOS E CONSULTAS");
                 System.out.println("[4] - SAIR DO AEROPORTO");
                 System.out.println("======================");
-                System.out.print("qual dessas opcoes vc escohe?");
+                System.out.print("qual dessas operações você deseja seguir?");
                 int opcao = input.nextInt();
 
                 input.nextLine();
 
                 switch (opcao) {
                     case 1 -> menuAdministrativo(input, aeroporto);
-                    case 2 -> menuPassgeiro(input, aeroporto);
-
+                    case 2 -> menuPassageiro(input, aeroporto);
+                    case 3 -> menuRelatoriosConsultas(input, aeroporto);
                     case 4 -> {
                         System.out.println("saindo do sistema do aeroporto....");
                         return;
@@ -57,6 +58,7 @@ public class Main {
     private static void menuAdministrativo(Scanner input, Aeroporto aeroporto) {
         while (true) {
             try {
+                System.out.println("===== SISTEMA ADMINISTRATIVO ======");
                 System.out.println("[1] - cadastrar aeronave");
                 System.out.println("[2] - remover aeronave");
                 System.out.println("[3] - cadastrar voo");
@@ -86,18 +88,14 @@ public class Main {
             } catch (java.util.InputMismatchException e) {
                 System.out.println("entrada invalida, por favor digite novamente");
                 input.nextLine();
-            } catch (NumeroRegistroInvalidoException | AeronaveNaoEncontradaException |
-                     VooDuplicadoException | NumeroVooDuplicadoException | VooNaoEncontradoException |
-                     CpfInvalidoException | CpfDuplicadoException
-                     | PassageiroNaoEncontradoException e) {
-                System.out.println(e.getMessage());
             }
         }
     }
 
-    private static void menuPassgeiro(Scanner input, Aeroporto aeroporto) {
+    private static void menuPassageiro(Scanner input, Aeroporto aeroporto) {
         while (true) {
             try {
+                System.out.println("===== SISTEMA DO PASSAGEIRO =====");
                 System.out.println("[1] - realizar check-in");
                 System.out.println("[2] - realizar embarque");
                 System.out.println("[3] - consultar seus voos");
@@ -116,10 +114,41 @@ public class Main {
                     }
                     default -> System.out.println("opcao invalida, por favor digite novamente");
                 }
-            } catch (PassageiroNaoEncontradoException | PassagemNaoEncontradaException | VooNaoEncontradoException | PassaporteNaoEncontradoException e) {
-                System.out.println(e.getMessage());
-            } catch (java.util.InputMismatchException e) {
+           } catch (java.util.InputMismatchException e) {
                 System.out.println("entrada invalida, por favor digite novamente");
+                input.nextLine();
+            }
+        }
+    }
+
+    private static void menuRelatoriosConsultas(Scanner input, Aeroporto aeroporto) {
+        while (true) {
+            try {
+                System.out.println("===== SISTEMA DE RELATORIOA E CONSULTAS");
+                System.out.println("[1] - listar voos por alguma caracteristica");
+                System.out.println("[2] - listar aeronaves");
+                System.out.println("[3] - listar passageiros de um voo");
+                System.out.println("[4] - mostrar historico de voos de um passageiro");
+                System.out.println("[5] - listar passageiros cadastrados no aeroporto");
+                System.out.println("[6] - sair do menu de relatorios e consultas");
+                System.out.println("--------------------");
+                System.out.print("qual dessas operações você deseja seguir?");
+                int opcao = input.nextInt();
+
+                switch (opcao) {
+                    case 1 -> aeroporto.listarVooPorCaracteristica();
+                    case 2 -> aeroporto.listarAeronaves();
+                    case 3 -> aeroporto.listarPassageirosVoo();
+                    case 4 -> aeroporto.listarVoosDoPassageiro();
+                    case 5 -> aeroporto.consultarInformacoesPassageiro();
+                    case 6 -> {
+                        System.out.println("saindo do menu de relatorios e passageiros");
+                        return;
+                    }
+                    default -> System.out.println("opção invalida, por favor digite novamente");
+                }
+            } catch (java.util.InputMismatchException e) {
+                System.out.println("entrada invalida, por favir digite novamente");
                 input.nextLine();
             }
         }

@@ -39,7 +39,7 @@ public class Aeroporto {
                 numRegistro.add(aeronave.getNumeroRegistro());
                 System.out.println("Aeronave do modelo " + aeronave.getModelo() + " do numero " + aeronave.getNumeroRegistro() + " foi registrada no sistema");
             }
-        } catch (NumeroRegistroDuplicadoException e) {
+        } catch (NumeroRegistroDuplicadoException | IllegalArgumentException | NumeroRegistroInvalidoException | CapacidadeMaximaInvalida e) {
             System.out.println(e.getMessage());
         } catch (java.util.InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
@@ -62,7 +62,7 @@ public class Aeroporto {
 
                 aeronaves.remove(aeronave.getNumeroRegistro(), aeronave);
                 numRegistro.remove(aeronave.getNumeroRegistro());
-                System.out.println("Aeronave do numero " + aeronave.getNumeroRegistro() + " removido do sistema");
+                System.out.println("Aeronave " +aeronave.getModelo()+ " do numero " + aeronave.getNumeroRegistro() + " removido do sistema");
             }
         } catch (AeronaveNaoEncontradaException e) {
             System.out.println(e.getMessage());
@@ -102,6 +102,8 @@ public class Aeroporto {
                 System.out.print("qual desses destinos o voo seguirá");
                 int opcao = input.nextInt();
 
+                input.nextLine();
+
                 Localidade destinoVoo = switch (opcao) {
                     case 1 -> Localidade.SAO_PAULO;
                     case 2 -> Localidade.RIO_DE_JANEIRO;
@@ -112,16 +114,16 @@ public class Aeroporto {
                 };
 
                 System.out.print("qual a data e o horario de partida?");
-                String dataHorarioPartida = input.nextLine().trim();
+                String dataPartida = input.nextLine().trim();
 
                 System.out.print("qual a data e o horario de chegada?");
-                String dataHorarioChegada = input.nextLine().trim();
+                String dataChegada = input.nextLine().trim();
 
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss");
-                LocalDateTime dataConvertidaPartida = LocalDateTime.parse(dataHorarioPartida, formatter);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+                LocalDateTime dataConvertidaPartida = LocalDateTime.parse(dataPartida, formatter);
 
-                DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss");
-                LocalDateTime dataConvertidaChegada = LocalDateTime.parse(dataHorarioChegada, formatter2);
+                DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+                LocalDateTime dataConvertidaChegada = LocalDateTime.parse(dataChegada, formatter2);
 
                 System.out.print("qual o numero da aeronave que ira realizar o voo?");
                 int num = input.nextInt();
@@ -129,7 +131,7 @@ public class Aeroporto {
                 Aeronave aeronave = aeronaves.values().stream()
                         .filter(a -> a.getNumeroRegistro() == num)
                         .findFirst()
-                        .orElseThrow(() -> new AeronaveNaoEncontradaException("não foi possivel cadastrar voo, pois não há nenhuma aeronave cadastrada no aeroporto"));
+                        .orElseThrow(() -> new AeronaveNaoEncontradaException("não foi possivel cadastrar voo, pois não há nenhuma aeronave com esse numero cadastrada no aeroporto"));
 
                 Voo voo = new Voo(numeroVoo, "VITORIA", destinoVoo, dataConvertidaPartida, dataConvertidaChegada, StatusVoo.AGENDADO, aeronave);
 
@@ -138,8 +140,9 @@ public class Aeroporto {
                 } else {
                     voosDoAeroporto.put(voo.getNumeroVoo(), voo);
                     numVoo.add(voo.getNumeroVoo());
-                    associarVooAeronave(voo);
+                    voo.getAeronaveAssociada().voosDaAeronave.put(voo.getNumeroVoo(), voo);
                     System.out.println("Voo do numero " + voo.getNumeroVoo() + " registrado no sistema do aeroporto");
+                    System.out.println("Voo do numero " + voo.getNumeroVoo() + " com destino a " + voo.getDestinoVoo() + " foi associado a aeronave de numero " + voo.getAeronaveAssociada().getNumeroRegistro());
                 }
             }
         } catch (VooDuplicadoException | AeronaveNaoEncontradaException | IllegalArgumentException e) {
@@ -152,25 +155,12 @@ public class Aeroporto {
         }
     }
 
-    private void associarVooAeronave(Voo voo) throws NumeroVooDuplicadoException {
-        try {
-            if (!numVoo.add(voo.getNumeroVoo())) {
-                throw new NumeroVooDuplicadoException("nao foi possivel associar o voo com a aeronave pois o numero de voo esta duplicado");
-            } else {
-                voo.getAeronaveAssociada().voosDaAeronave.put(voo.getNumeroVoo(), voo);
-                System.out.println("Voo do numero " + voo.getNumeroVoo() + " com destino a " + voo.getDestinoVoo() + " foi associado a aeronave de numero " + voo.getAeronaveAssociada().getNumeroRegistro());
-            }
-        } catch (NumeroVooDuplicadoException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
     public void cancelarVooAeroporto() throws VooNaoEncontradoException {
         try {
             if (voosDoAeroporto.isEmpty()) {
                 System.out.println("nã foi possivel cancelar um voo do aeroporto pois não há ennhum registrado");
             } else {
-                System.out.println("qual o numero do voo que vc deseja cancelar?");
+                System.out.print("qual o numero do voo que vc deseja cancelar?");
                 int num = input.nextInt();
 
                 Voo voo = voosDoAeroporto.values().stream()
@@ -370,7 +360,7 @@ public class Aeroporto {
                 cpf.add(passageiro.getCpfPassageiro());
                 System.out.println("passageiro " + passageiro.getNomePassageiro() + " adicionado ao aeroporto");
             }
-        } catch (CpfDuplicadoException e) {
+        } catch (CpfDuplicadoException | IllegalArgumentException | CpfInvalidoException | PassaporteInvalidoException e) {
             System.out.println(e.getMessage());
         } catch (java.util.InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
@@ -449,73 +439,77 @@ public class Aeroporto {
 
     public void realizarCheckIn() throws PassageiroNaoEncontradoException, VooNaoEncontradoException, VagasIndisponiveisException {
         try {
-            double precoPassagem;
-            double precoDistancia;
-            double precoDia;
-            double precoHora;
-
-            System.out.print("informe o seu cpf:");
-            String cpf = input.nextLine().trim();
-
-            input.nextLine();
-
-            System.out.print("informe o numero do voo que vc ira embarcar");
-            int numeroVoo = input.nextInt();
-
-            Passageiros passageiro = passageirosCadastrados.values().stream()
-                    .filter(a -> a.getCpfPassageiro().equalsIgnoreCase(cpf))
-                    .findFirst()
-                    .orElseThrow(() -> new PassageiroNaoEncontradoException("não foi possivel cadastrar o passageiro no voo pois o cpf nao foi encontrado"));
-
-            Voo voo = voosDoAeroporto.values().stream()
-                    .filter(a -> a.getNumeroVoo() == numeroVoo)
-                    .filter(b -> b.getStatusVoo() == StatusVoo.AGENDADO)
-                    .findFirst()
-                    .orElseThrow(() -> new VooNaoEncontradoException("não foi possivel o passageiro embarcar no voo pois o numero do voo não foi encontrado |OU| o voo ja passou do agendamento"));
-
-            verificarDisponibilidadeAeronave(voo);
-
-            System.out.print("qual o numero da passagem?");
-            int numeroPassagem = input.nextInt();
-
-            if (voo.getDestinoVoo().getDistancia() < 600) {
-                precoDistancia = 41.89;
-            } else if (voo.getDestinoVoo().getDistancia() < 1200) {
-                precoDistancia = 60.87;
+            if (passageirosCadastrados.isEmpty()) {
+                System.out.println("não foi possivel realizar o check in pois não há nenhum passageiro cadastrado no sistema");
             } else {
-                precoDistancia = 79.49;
+                double precoPassagem;
+                double precoDistancia;
+                double precoDia;
+                double precoHora;
+
+                System.out.print("informe o seu cpf:");
+                String cpf = input.nextLine().trim();
+
+                input.nextLine();
+
+                System.out.print("informe o numero do voo que vc ira embarcar");
+                int numeroVoo = input.nextInt();
+
+                Passageiros passageiro = passageirosCadastrados.values().stream()
+                        .filter(a -> a.getCpfPassageiro().equalsIgnoreCase(cpf))
+                        .findFirst()
+                        .orElseThrow(() -> new PassageiroNaoEncontradoException("não foi possivel cadastrar o passageiro no voo pois o cpf nao foi encontrado"));
+
+                Voo voo = voosDoAeroporto.values().stream()
+                        .filter(a -> a.getNumeroVoo() == numeroVoo)
+                        .filter(b -> b.getStatusVoo() == StatusVoo.AGENDADO)
+                        .findFirst()
+                        .orElseThrow(() -> new VooNaoEncontradoException("não foi possivel o passageiro embarcar no voo pois o numero do voo não foi encontrado |OU| o voo ja passou do agendamento"));
+
+                verificarDisponibilidadeAeronave(voo);
+
+                System.out.print("qual o numero da passagem?");
+                int numeroPassagem = input.nextInt();
+
+                if (voo.getDestinoVoo().getDistancia() < 600) {
+                    precoDistancia = 41.89;
+                } else if (voo.getDestinoVoo().getDistancia() < 1200) {
+                    precoDistancia = 60.87;
+                } else {
+                    precoDistancia = 79.49;
+                }
+
+                DayOfWeek dia = voo.getDataHorarioPartida().getDayOfWeek();
+
+                if (dia.getValue() == 2 || dia.getValue() == 3 || dia.getValue() == 4) {
+                    precoDia = 19.99;
+                } else if (dia.getValue() == 6 || dia.getValue() == 7 || dia.getValue() == 5) {
+                    precoDia = 35.85;
+                } else {
+                    precoDia = 23.94;
+                }
+
+                int horaVoo = voo.getDataHorarioPartida().getHour();
+
+                if (horaVoo >= 17 && horaVoo <= 21) {
+                    precoHora = 50;
+                } else if (horaVoo > 0 && horaVoo <= 6) {
+                    precoHora = 22;
+                } else if (horaVoo > 6 && horaVoo <= 13) {
+                    precoHora = 34;
+                } else if (horaVoo > 13 && horaVoo < 17) {
+                    precoHora = 41;
+                } else {
+                    precoHora = 28;
+                }
+
+                precoPassagem = precoDia + precoDistancia + precoHora;
+
+                Passagem passagem = new Passagem(numeroPassagem, passageiro, voo, precoPassagem);
+                passageiro.passageirosVoosCadastrados.add(voo);
+                passageiro.passagensDoPassageiro.add(passagem);
+                System.out.println("passageiro " + passageiro.getNomePassageiro() + " registrado no voo " + voo.getNumeroVoo() + " com destino a " + voo.getDestinoVoo());
             }
-
-            DayOfWeek dia = voo.getDataHorarioPartida().getDayOfWeek();
-
-            if (dia.getValue() == 2 || dia.getValue() == 3 || dia.getValue() == 4) {
-                precoDia = 19.99;
-            } else if (dia.getValue() == 6 || dia.getValue() == 7 || dia.getValue() == 5) {
-                precoDia = 35.85;
-            } else {
-                precoDia = 23.94;
-            }
-
-            int horaVoo = voo.getDataHorarioPartida().getHour();
-
-            if (horaVoo >= 17 && horaVoo <= 21) {
-                precoHora = 50;
-            } else if (horaVoo > 0 && horaVoo <= 6) {
-                precoHora = 22;
-            } else if (horaVoo > 6 && horaVoo <= 13) {
-                precoHora = 34;
-            } else if (horaVoo > 13 && horaVoo < 17) {
-                precoHora = 41;
-            } else {
-                precoHora = 28;
-            }
-
-            precoPassagem = precoDia + precoDistancia + precoHora;
-
-            Passagem passagem = new Passagem(numeroPassagem, passageiro, voo, precoPassagem);
-            passageiro.passageirosVoosCadastrados.add(voo);
-            passageiro.passagensDoPassageiro.add(passagem);
-            System.out.println("passageiro " + passageiro.getNomePassageiro() + " registrado no voo " + voo.getNumeroVoo() + " com destino a " + voo.getDestinoVoo());
         } catch (PassageiroNaoEncontradoException | VooNaoEncontradoException e) {
             System.out.println(e.getMessage());
         } catch (java.util.InputMismatchException e) {
@@ -524,29 +518,34 @@ public class Aeroporto {
         }
     }
 
+
     public void realizarEmbarque() {
         try {
-            System.out.print("qual o numero da passagem?");
-            int numPassagem = input.nextInt();
+            if (passageirosCadastrados.isEmpty() || voosDoAeroporto.isEmpty() || aeronaves.isEmpty()) {
+                System.out.println("não foi possivel realizar embarque pois não há passageiros cadastrados |OU| não há nenhum voo cadastrado |OU| não há nenhuma aeronave cadastrada");
+            } else {
+                System.out.print("qual o numero da passagem?");
+                int numPassagem = input.nextInt();
 
-            input.nextLine();
+                input.nextLine();
 
-            System.out.print("qual o numero do passaporte?");
-            String numPassaporte = input.nextLine();
+                System.out.print("qual o numero do passaporte?");
+                String numPassaporte = input.nextLine();
 
-            Passageiros passageiro = passageirosCadastrados.values().stream()
-                    .filter(a -> a.getNumeroPassaporte().equalsIgnoreCase(numPassaporte))
-                    .findFirst()
-                    .orElseThrow(() -> new PassageiroNaoEncontradoException("não foi possivel realizar embarque pois nenhum passageiro foi encontrado com esse numero de passaporte"));
+                Passageiros passageiro = passageirosCadastrados.values().stream()
+                        .filter(a -> a.getNumeroPassaporte().equalsIgnoreCase(numPassaporte))
+                        .findFirst()
+                        .orElseThrow(() -> new PassageiroNaoEncontradoException("não foi possivel realizar embarque pois nenhum passageiro foi encontrado com esse numero de passaporte"));
 
-            Passagem passagem = passageiro.passagensDoPassageiro.stream()
-                    .filter(a -> a.getNumeroPassagem() == numPassagem)
-                    .filter(b -> b.getVooPassagem().getStatusVoo() == StatusVoo.EMBARCANDO)
-                    .filter(c -> c.getPassageiro().getNumeroPassaporte().equalsIgnoreCase(passageiro.getNumeroPassaporte()))
-                    .findFirst()
-                    .orElseThrow(() -> new PassagemNaoEncontradaException("não foi possivel realizar embarque pois o numero da passagem não foi encontrado |OU| o voo ja não esta mais embarcando |OU| o numero da passagem fornecida não corresponde ao passageiro fornecido"));
+                Passagem passagem = passageiro.passagensDoPassageiro.stream()
+                        .filter(a -> a.getNumeroPassagem() == numPassagem)
+                        .filter(b -> b.getVooPassagem().getStatusVoo() == StatusVoo.EMBARCANDO)
+                        .filter(c -> c.getPassageiro().getNumeroPassaporte().equalsIgnoreCase(passageiro.getNumeroPassaporte()))
+                        .findFirst()
+                        .orElseThrow(() -> new PassagemNaoEncontradaException("não foi possivel realizar embarque pois o numero da passagem não foi encontrado |OU| o voo ja não esta mais embarcando |OU| o numero da passagem fornecida não corresponde ao passageiro fornecido"));
 
-            passagem.getVooPassagem().passageirosNoVoo.put(passagem.getNumeroPassagem(), passagem);
+                passagem.getVooPassagem().passageirosNoVoo.put(passagem.getNumeroPassagem(), passagem);
+            }
         } catch (PassagemNaoEncontradaException | PassageiroNaoEncontradoException e) {
             System.out.println(e.getMessage());
         } catch (java.util.InputMismatchException e) {

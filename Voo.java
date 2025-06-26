@@ -95,6 +95,7 @@ public class Voo {
     }
 
     public void cancelarVoo(Voo voo) throws VooNaoEncontradoException, IllegalArgumentException {
+        try {
             System.out.println("===== DETALHES DO VOO =====");
             voo.exibirDetalhesVoo();
             System.out.println("1 - sim");
@@ -117,7 +118,13 @@ public class Voo {
                 default:
                     System.out.println("opção invalida, por favor digite novamente");
             }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        } catch (java.util.InputMismatchException e) {
+            System.out.println("entrada invalida, por favor digite novamente");
+            input.nextLine();
         }
+    }
 
 
     public void alterarStatusVoo(Voo voo) throws VooNaoEncontradoException {

@@ -1,35 +1,57 @@
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
+    private final Aeroporto aeroporto;
+    private final ScheduledExecutorService scheduler;
+
+    public Main(Aeroporto aeroporto) {
+        this.aeroporto = aeroporto;
+        this.scheduler = Executors.newSingleThreadScheduledExecutor();
+    }
+
+
+    public void iniciarAtualizacaoAutomatica() {
+        scheduler.scheduleAtFixedRate(() -> {
+            LocalDateTime tempoAtual = LocalDateTime.now();
+
+            for (Voo voo : aeroporto.voosDoAeroporto.values()) {
+                if (voo.getDataHorarioPartida().toLocalDate().equals(tempoAtual.toLocalDate())) {
+                    long minutos = ChronoUnit.MINUTES.between(voo.getDataHorarioPartida(), tempoAtual);
+
+                    if (minutos >= 0 && minutos < 60) {
+                        voo.setStatusVoo(StatusVoo.EMBARCANDO);
+                    } else if (tempoAtual.isAfter(voo.getDataHorarioPartida()) && tempoAtual.isBefore(voo.getDataHorarioChegada())) {
+                        voo.setStatusVoo(StatusVoo.EM_VOO);
+                    } else if (tempoAtual.isAfter(voo.getDataHorarioChegada())) {
+                        if (voo.getStatusVoo() != StatusVoo.FINALIZADO) {
+                            voo.setStatusVoo(StatusVoo.FINALIZADO);
+                            voo.passageirosNoVoo.clear();
+                        }
+                    }
+                }
+            }
+
+        }, 0, 1, TimeUnit.MINUTES);
+    }
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
 
         Aeroporto aeroporto = new Aeroporto();
 
-        LocalDateTime tempoAtual = LocalDateTime.now();
+        Main atualizar = new Main(aeroporto);
 
-        for (Voo voo : aeroporto.voosDoAeroporto.values()) {
-            if (voo.getDataHorarioPartida().getDayOfMonth() == LocalDateTime.now().getDayOfMonth()) {
-                long minutos = ChronoUnit.MINUTES.between(voo.getDataHorarioPartida(), LocalDateTime.now());
-                if (minutos < 60 && minutos > 0) {
-                    voo.setStatusVoo(StatusVoo.EMBARCANDO);
-                } else if (tempoAtual.isAfter(voo.getDataHorarioPartida()) && tempoAtual.isBefore(voo.getDataHorarioChegada())) {
-                    voo.setStatusVoo(StatusVoo.EM_VOO);
-                } else if (tempoAtual.isAfter(voo.getDataHorarioChegada())) {
-                    voo.setStatusVoo(StatusVoo.FINALIZADO);
-                    voo.passageirosNoVoo.clear();
-                    System.out.println("o voo " +voo.getNumeroVoo()+ " desembarcou em " +voo.getDestinoVoo());
-                }
-            }
-        }
+        atualizar.iniciarAtualizacaoAutomatica();
 
         while (true) {
             try {
                 System.out.println("===== SISTEMA DO AEROPORTO =====");
                 System.out.println("[1] - MENU ADMINISTRATIVO");
-                System.out.println("[2]- MENU DO PASSAGEIRO");
+                System.out.println("[2] - MENU DO PASSAGEIRO");
                 System.out.println("[3] - MENU DE RELATORIOS E CONSULTAS");
                 System.out.println("[4] - SAIR DO AEROPORTO");
                 System.out.println("======================");
@@ -72,10 +94,10 @@ public class Main {
                 int opcao = input.nextInt();
 
                 switch (opcao) {
-                    case 1 -> aeroporto.cadastrarAeronaveAeroporto();
-                    case 2 -> aeroporto.removerAeronaveAeroporto();
-                    case 3 -> aeroporto.cadastrarVooAeroporto();
-                    case 4 -> aeroporto.cancelarVooAeroporto();
+                    case 1 -> aeroporto.cadastrarAeronaveAeroporto(); // confere
+                    case 2 -> aeroporto.removerAeronaveAeroporto(); // confere
+                    case 3 -> aeroporto.cadastrarVooAeroporto(); // confere
+                    case 4 -> aeroporto.cancelarVooAeroporto(); // confere
                     case 5 -> aeroporto.cadastrarPassageirosAeroporto();
                     case 6 -> aeroporto.removerPassageiroAeroporto();
                     case 7 -> aeroporto.alterarStatusVooAeroporto();
@@ -124,7 +146,7 @@ public class Main {
     private static void menuRelatoriosConsultas(Scanner input, Aeroporto aeroporto) {
         while (true) {
             try {
-                System.out.println("===== SISTEMA DE RELATORIOA E CONSULTAS");
+                System.out.println("===== SISTEMA DE RELATORIOS E CONSULTAS =====");
                 System.out.println("[1] - listar voos por alguma caracteristica");
                 System.out.println("[2] - listar aeronaves");
                 System.out.println("[3] - listar passageiros de um voo");

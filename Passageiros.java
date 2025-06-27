@@ -21,6 +21,7 @@ public class Passageiros {
         } else {
             this.nomePassageiro = nomePassageiro;
             this.cpfPassageiro = cpfPassageiro;
+            this.numeroPassaporte = numeroPassaporte;
         }
     }
 

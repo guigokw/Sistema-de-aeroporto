@@ -125,6 +125,10 @@ public class Aeroporto {
                 DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
                 LocalDateTime dataConvertidaChegada = LocalDateTime.parse(dataChegada, formatter2);
 
+                if (dataConvertidaChegada.isBefore(dataConvertidaPartida)) {
+                    throw new DataInvalidaException("não foi possivel cadastrar o voo a data de chegada foi registrada antes da data de partida");
+                }
+
                 System.out.print("qual o numero da aeronave que ira realizar o voo?");
                 int num = input.nextInt();
 
@@ -145,7 +149,8 @@ public class Aeroporto {
                     System.out.println("Voo do numero " + voo.getNumeroVoo() + " com destino a " + voo.getDestinoVoo() + " foi associado a aeronave de numero " + voo.getAeronaveAssociada().getNumeroRegistro());
                 }
             }
-        } catch (VooDuplicadoException | AeronaveNaoEncontradaException | IllegalArgumentException e) {
+
+        } catch (VooDuplicadoException | AeronaveNaoEncontradaException | IllegalArgumentException | DataInvalidaException e) {
             System.out.println(e.getMessage());
         } catch (DateTimeParseException e) {
             System.out.println("não foi possivel cadastrar voo, pois o formato de data esta incorreto");
@@ -186,6 +191,8 @@ public class Aeroporto {
                 System.out.print("qual o numero do voo que vc deseja alterar o status?");
                 int num = input.nextInt();
 
+                input.nextLine();
+
                 Voo voo = voosDoAeroporto.values().stream()
                         .filter(a -> a.getNumeroVoo() == num)
                         .findFirst()
@@ -208,9 +215,8 @@ public class Aeroporto {
                 System.out.println("nao foi possivel listar voos pois não há nenhum registrado no sistema");
             } else {
                 System.out.println("1 - status");
-                System.out.println("2 - origem");
-                System.out.println("3 - destino");
-                System.out.println("4 - data");
+                System.out.println("2 - destino");
+                System.out.println("3 - data");
                 System.out.println("-------------------");
                 System.out.print("qual dessas caracteristicas de voo vc deseja fazer uma listagem?");
                 int opcao = input.nextInt();
@@ -280,30 +286,32 @@ public class Aeroporto {
                         }
                         break;
                     case 2:
-                        System.out.print("qual a origem dos voos que vc deseja listar?");
-                        String origem = input.nextLine();
-
-                        Voo voo = voosDoAeroporto.values().stream()
-                                .filter(a -> a.getOrigemVoo().equalsIgnoreCase(origem))
-                                .findAny()
-                                .orElseThrow(() -> new VooNaoEncontradoException("não foi possivel listar os voos com origem " + origem + " pois nenhum foi encontrado"));
-
-                        System.out.println("====== DETALHES DOS VOOS COM ORIGEM DE " + origem.toUpperCase() + " ======");
-                        voo.exibirDetalhesVoo();
-                        break;
-                    case 3:
+                        System.out.println("1 - são paulo");
+                        System.out.println("2 - rio de janeiro");
+                        System.out.println("3 - florianopolis");
+                        System.out.println("4 - goias");
+                        System.out.println("5 - belo horizonte");
                         System.out.print("qual o destino dos voos que vc deseja listar?");
-                        String destino = input.nextLine();
+                        int opcao3 = input.nextInt();
+
+                        Localidade local = switch (opcao3) {
+                            case 1 -> Localidade.SAO_PAULO;
+                            case 2 -> Localidade.RIO_DE_JANEIRO;
+                            case 3 -> Localidade.FLORIANOPOLIS;
+                            case 4 -> Localidade.GOIAS;
+                            case 5 -> Localidade.BELO_HORIZONTE;
+                            default -> throw new IllegalArgumentException("opcao invalida, por favor digite novamente");
+                        };
 
                         Voo voo2 = voosDoAeroporto.values().stream()
-                                .filter(a -> a.getOrigemVoo().equalsIgnoreCase(destino))
+                                .filter(a -> a.getDestinoVoo() == local)
                                 .findAny()
-                                .orElseThrow(() -> new VooNaoEncontradoException("não foi possivel listar os voos com origem " + destino + " pois nenhum foi encontrado"));
+                                .orElseThrow(() -> new VooNaoEncontradoException("não foi possivel listar os voos com destino " + local + " pois nenhum foi encontrado"));
 
-                        System.out.println("====== DETALHES DOS VOOS COM ORIGEM DE " + destino.toUpperCase() + " =====");
+                        System.out.println("====== DETALHES DOS VOOS COM DESTINO DE " + local + " =====");
                         voo2.exibirDetalhesVoo();
                         break;
-                    case 4:
+                    case 3:
                         System.out.print("qual a data dos voos que vc deseja listar");
                         String dataVoo = input.nextLine().trim();
 
@@ -345,13 +353,15 @@ public class Aeroporto {
             System.out.print("qual o nome do passageiro?");
             String nomePassageiro = input.nextLine();
 
+            input.nextLine();
+
             System.out.print("qual o cpf do passageiro?");
-            String cpfPassageiro = input.nextLine().trim();
+            String cpfPassageiro = input.nextLine().strip();
 
             System.out.print("qual o numero do passaporte do passageiro?");
-            String numeroPassaporte = input.nextLine().trim();
+            String numeroPassaporte = input.nextLine().strip();
 
-            Passageiros passageiro = new Passageiros(nomePassageiro, cpfPassageiro.replaceAll("\\d", ""), numeroPassaporte.replaceAll("\\d", ""));
+            Passageiros passageiro = new Passageiros(nomePassageiro, cpfPassageiro.replaceAll("[a-zA-Z]", "").strip(), numeroPassaporte.replaceAll("[a-zA-Z]", "").strip());
 
             if (!cpf.add(passageiro.getCpfPassageiro())) {
                 throw new CpfDuplicadoException("não foi possivel adicionar o passageiro a lista de passageiros, pois o cpf esta duplicado");
@@ -373,8 +383,8 @@ public class Aeroporto {
             if (passageirosCadastrados.isEmpty()) {
                 System.out.println("não há passageiros cadastrados no aeroporto");
             } else {
-                System.out.print("qual o cpf do passageiro que vc deseja remover do voo?");
-                String cpfPessoa = input.nextLine();
+                System.out.print("qual o cpf do passageiro que vc deseja remover do aeroporto?");
+                String cpfPessoa = input.nextLine().strip();
 
                 Passageiros passageiro = passageirosCadastrados.values().stream()
                         .filter(a -> a.getCpfPassageiro().equalsIgnoreCase(cpfPessoa))
@@ -417,7 +427,7 @@ public class Aeroporto {
                 System.out.println("não foi possivel consultar as informações de um passageiro pois nenhum foi encontrado");
             } else {
                 System.out.print("qual o cpf do passageiro que vc deseja consultar infromacoes?");
-                String cpf = input.nextLine();
+                String cpf = input.nextLine().strip();
 
                 Passageiros passageiro = passageirosCadastrados.values().stream()
                         .filter(a -> a.getCpfPassageiro().equalsIgnoreCase(cpf))

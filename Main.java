@@ -93,13 +93,15 @@ public class Main {
                 System.out.print("escolha uma dessas opções:");
                 int opcao = input.nextInt();
 
+                input.nextLine();
+
                 switch (opcao) {
                     case 1 -> aeroporto.cadastrarAeronaveAeroporto(); // confere
                     case 2 -> aeroporto.removerAeronaveAeroporto(); // confere
                     case 3 -> aeroporto.cadastrarVooAeroporto(); // confere
                     case 4 -> aeroporto.cancelarVooAeroporto(); // confere
-                    case 5 -> aeroporto.cadastrarPassageirosAeroporto();
-                    case 6 -> aeroporto.removerPassageiroAeroporto();
+                    case 5 -> aeroporto.cadastrarPassageirosAeroporto(); // confere
+                    case 6 -> aeroporto.removerPassageiroAeroporto(); // confere
                     case 7 -> aeroporto.alterarStatusVooAeroporto();
                     case 8 -> {
                         System.out.println("saindo do menu administrativo....");
@@ -125,6 +127,8 @@ public class Main {
                 System.out.println("-----------------------");
                 System.out.print("qual dessa operações vc deseja realizar?");
                 int opcao = input.nextInt();
+
+                input.nextLine();
 
                 switch (opcao) {
                     case 1 -> aeroporto.realizarCheckIn();
@@ -156,6 +160,8 @@ public class Main {
                 System.out.println("--------------------");
                 System.out.print("qual dessas operações você deseja seguir?");
                 int opcao = input.nextInt();
+
+                input.nextLine();
 
                 switch (opcao) {
                     case 1 -> aeroporto.listarVooPorCaracteristica();

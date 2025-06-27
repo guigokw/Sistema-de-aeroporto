@@ -128,6 +128,7 @@ public class Voo {
 
 
     public void alterarStatusVoo(Voo voo) throws VooNaoEncontradoException {
+        input.nextLine();
         System.out.println("====== DETALHES DO VOO ======");
         voo.exibirDetalhesVoo();
         System.out.println("1 - sim");

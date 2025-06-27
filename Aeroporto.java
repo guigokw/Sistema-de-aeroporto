@@ -109,7 +109,7 @@ public class Aeroporto {
                     case 2 -> Localidade.RIO_DE_JANEIRO;
                     case 3 -> Localidade.FLORIANOPOLIS;
                     case 4 -> Localidade.GOIAS;
-                    case 6 -> Localidade.BELO_HORIZONTE;
+                    case 5 -> Localidade.BELO_HORIZONTE;
                     default -> throw new IllegalArgumentException("opcao invalida, por favor digite novamente");
                 };
 
@@ -190,8 +190,6 @@ public class Aeroporto {
             } else {
                 System.out.print("qual o numero do voo que vc deseja alterar o status?");
                 int num = input.nextInt();
-
-                input.nextLine();
 
                 Voo voo = voosDoAeroporto.values().stream()
                         .filter(a -> a.getNumeroVoo() == num)
@@ -350,16 +348,16 @@ public class Aeroporto {
 
     public void cadastrarPassageirosAeroporto() throws CpfDuplicadoException, CpfInvalidoException {
         try {
+            input.nextLine();
+
             System.out.print("qual o nome do passageiro?");
             String nomePassageiro = input.nextLine();
 
-            input.nextLine();
-
             System.out.print("qual o cpf do passageiro?");
-            String cpfPassageiro = input.nextLine().strip();
+            String cpfPassageiro = input.nextLine().trim();
 
             System.out.print("qual o numero do passaporte do passageiro?");
-            String numeroPassaporte = input.nextLine().strip();
+            String numeroPassaporte = input.nextLine().trim();
 
             Passageiros passageiro = new Passageiros(nomePassageiro, cpfPassageiro.replaceAll("[a-zA-Z]", "").strip(), numeroPassaporte.replaceAll("[a-zA-Z]", "").strip());
 
@@ -383,8 +381,10 @@ public class Aeroporto {
             if (passageirosCadastrados.isEmpty()) {
                 System.out.println("não há passageiros cadastrados no aeroporto");
             } else {
+                input.nextLine();
+
                 System.out.print("qual o cpf do passageiro que vc deseja remover do aeroporto?");
-                String cpfPessoa = input.nextLine().strip();
+                String cpfPessoa = input.nextLine().trim();
 
                 Passageiros passageiro = passageirosCadastrados.values().stream()
                         .filter(a -> a.getCpfPassageiro().equalsIgnoreCase(cpfPessoa))
@@ -427,7 +427,7 @@ public class Aeroporto {
                 System.out.println("não foi possivel consultar as informações de um passageiro pois nenhum foi encontrado");
             } else {
                 System.out.print("qual o cpf do passageiro que vc deseja consultar infromacoes?");
-                String cpf = input.nextLine().strip();
+                String cpf = input.nextLine();
 
                 Passageiros passageiro = passageirosCadastrados.values().stream()
                         .filter(a -> a.getCpfPassageiro().equalsIgnoreCase(cpf))

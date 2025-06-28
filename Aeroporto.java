@@ -14,6 +14,7 @@ public class Aeroporto {
     Set<Integer> numVoo = new HashSet<>();
     Set<String> cpf = new HashSet<>();
     Map<String, Passageiros> passageirosCadastrados = new HashMap<>();
+    Set<Integer> numPassagem = new HashSet<>();
 
     // MENU DE ADMINISTRACAO
 
@@ -39,7 +40,8 @@ public class Aeroporto {
                 numRegistro.add(aeronave.getNumeroRegistro());
                 System.out.println("Aeronave do modelo " + aeronave.getModelo() + " do numero " + aeronave.getNumeroRegistro() + " foi registrada no sistema");
             }
-        } catch (NumeroRegistroDuplicadoException | IllegalArgumentException | NumeroRegistroInvalidoException | CapacidadeMaximaInvalida e) {
+        } catch (NumeroRegistroDuplicadoException | IllegalArgumentException | NumeroRegistroInvalidoException |
+                 CapacidadeMaximaInvalida e) {
             System.out.println(e.getMessage());
         } catch (java.util.InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
@@ -62,7 +64,7 @@ public class Aeroporto {
 
                 aeronaves.remove(aeronave.getNumeroRegistro(), aeronave);
                 numRegistro.remove(aeronave.getNumeroRegistro());
-                System.out.println("Aeronave " +aeronave.getModelo()+ " do numero " + aeronave.getNumeroRegistro() + " removido do sistema");
+                System.out.println("Aeronave " + aeronave.getModelo() + " do numero " + aeronave.getNumeroRegistro() + " removido do sistema");
             }
         } catch (AeronaveNaoEncontradaException e) {
             System.out.println(e.getMessage());
@@ -150,7 +152,8 @@ public class Aeroporto {
                 }
             }
 
-        } catch (VooDuplicadoException | AeronaveNaoEncontradaException | IllegalArgumentException | DataInvalidaException e) {
+        } catch (VooDuplicadoException | AeronaveNaoEncontradaException | IllegalArgumentException |
+                 DataInvalidaException e) {
             System.out.println(e.getMessage());
         } catch (DateTimeParseException e) {
             System.out.println("não foi possivel cadastrar voo, pois o formato de data esta incorreto");
@@ -218,6 +221,8 @@ public class Aeroporto {
                 System.out.println("-------------------");
                 System.out.print("qual dessas caracteristicas de voo vc deseja fazer uma listagem?");
                 int opcao = input.nextInt();
+
+                input.nextLine();
 
                 switch (opcao) {
                     case 1:
@@ -334,17 +339,10 @@ public class Aeroporto {
         } catch (java.util.InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
             input.nextLine();
+        } catch (DateTimeParseException e) {
+            System.out.println("não foi possivel encontrar o voo pois o formato de data inserido esta incorreto");
         }
     }
-
-    private void verificarDisponibilidadeAeronave(Voo voo) throws VooNaoEncontradoException {
-        try {
-            voo.verificarDisponibilidadeAssento(voo);
-        } catch (VagasIndisponiveisException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
 
     public void cadastrarPassageirosAeroporto() throws CpfDuplicadoException, CpfInvalidoException {
         try {
@@ -368,7 +366,8 @@ public class Aeroporto {
                 cpf.add(passageiro.getCpfPassageiro());
                 System.out.println("passageiro " + passageiro.getNomePassageiro() + " adicionado ao aeroporto");
             }
-        } catch (CpfDuplicadoException | IllegalArgumentException | CpfInvalidoException | PassaporteInvalidoException e) {
+        } catch (CpfDuplicadoException | IllegalArgumentException | CpfInvalidoException |
+                 PassaporteInvalidoException e) {
             System.out.println(e.getMessage());
         } catch (java.util.InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
@@ -452,6 +451,9 @@ public class Aeroporto {
             if (passageirosCadastrados.isEmpty()) {
                 System.out.println("não foi possivel realizar o check in pois não há nenhum passageiro cadastrado no sistema");
             } else {
+
+                input.nextLine();
+
                 double precoPassagem;
                 double precoDistancia;
                 double precoDia;
@@ -459,8 +461,6 @@ public class Aeroporto {
 
                 System.out.print("informe o seu cpf:");
                 String cpf = input.nextLine().trim();
-
-                input.nextLine();
 
                 System.out.print("informe o numero do voo que vc ira embarcar");
                 int numeroVoo = input.nextInt();
@@ -476,51 +476,63 @@ public class Aeroporto {
                         .findFirst()
                         .orElseThrow(() -> new VooNaoEncontradoException("não foi possivel o passageiro embarcar no voo pois o numero do voo não foi encontrado |OU| o voo ja passou do agendamento"));
 
-                verificarDisponibilidadeAeronave(voo);
+                long total = voo.passageirosCheckIn.values().size();
 
-                System.out.print("qual o numero da passagem?");
-                int numeroPassagem = input.nextInt();
+                long assentosRestantes = voo.getAeronaveAssociada().getCapacidadeMaxima() - total;
 
-                if (voo.getDestinoVoo().getDistancia() < 600) {
-                    precoDistancia = 41.89;
-                } else if (voo.getDestinoVoo().getDistancia() < 1200) {
-                    precoDistancia = 60.87;
+                if (assentosRestantes <= 0) {
+                    throw new VagasIndisponiveisException("não há mais vagas no voo " + voo.getNumeroVoo());
                 } else {
-                    precoDistancia = 79.49;
+                    System.out.println("ainda há " + assentosRestantes + " assentos restantes no voo " + voo.getNumeroVoo());
+                    System.out.print("qual o numero da passagem?");
+                    int numeroPassagem = input.nextInt();
+
+                    if (voo.getDestinoVoo().getDistancia() < 600) {
+                        precoDistancia = 41.89;
+                    } else if (voo.getDestinoVoo().getDistancia() < 1200) {
+                        precoDistancia = 60.87;
+                    } else {
+                        precoDistancia = 79.49;
+                    }
+
+                    DayOfWeek dia = voo.getDataHorarioPartida().getDayOfWeek();
+
+                    if (dia.getValue() == 2 || dia.getValue() == 3 || dia.getValue() == 4) {
+                        precoDia = 19.99;
+                    } else if (dia.getValue() == 6 || dia.getValue() == 7 || dia.getValue() == 5) {
+                        precoDia = 35.85;
+                    } else {
+                        precoDia = 23.94;
+                    }
+
+                    int horaVoo = voo.getDataHorarioPartida().getHour();
+
+                    if (horaVoo >= 17 && horaVoo <= 21) {
+                        precoHora = 50;
+                    } else if (horaVoo > 0 && horaVoo <= 6) {
+                        precoHora = 22;
+                    } else if (horaVoo > 6 && horaVoo <= 13) {
+                        precoHora = 34;
+                    } else if (horaVoo > 13 && horaVoo < 17) {
+                        precoHora = 41;
+                    } else {
+                        precoHora = 28;
+                    }
+
+                    precoPassagem = precoDia + precoDistancia + precoHora;
+
+                    Passagem passagem = new Passagem(numeroPassagem, passageiro, voo, precoPassagem);
+                    if (!numPassagem.add(passagem.getNumeroPassagem())) {
+                        throw new NumeroPassagemDuplicadoException("não foi possivel adicionar o passageiro nesse voo pois o numero da passagem esta duplicado");
+                    } else {
+                        passageiro.passageirosVoosCadastrados.add(voo);
+                        passageiro.passagensDoPassageiro.add(passagem);
+                        voo.passageirosCheckIn.put(passagem.getNumeroPassagem(), passagem);
+                        System.out.println("passageiro " + passageiro.getNomePassageiro() + " registrado no voo " + voo.getNumeroVoo() + " com destino a " + voo.getDestinoVoo() + " com a passagem custando " + precoPassagem);
+                    }
                 }
-
-                DayOfWeek dia = voo.getDataHorarioPartida().getDayOfWeek();
-
-                if (dia.getValue() == 2 || dia.getValue() == 3 || dia.getValue() == 4) {
-                    precoDia = 19.99;
-                } else if (dia.getValue() == 6 || dia.getValue() == 7 || dia.getValue() == 5) {
-                    precoDia = 35.85;
-                } else {
-                    precoDia = 23.94;
-                }
-
-                int horaVoo = voo.getDataHorarioPartida().getHour();
-
-                if (horaVoo >= 17 && horaVoo <= 21) {
-                    precoHora = 50;
-                } else if (horaVoo > 0 && horaVoo <= 6) {
-                    precoHora = 22;
-                } else if (horaVoo > 6 && horaVoo <= 13) {
-                    precoHora = 34;
-                } else if (horaVoo > 13 && horaVoo < 17) {
-                    precoHora = 41;
-                } else {
-                    precoHora = 28;
-                }
-
-                precoPassagem = precoDia + precoDistancia + precoHora;
-
-                Passagem passagem = new Passagem(numeroPassagem, passageiro, voo, precoPassagem);
-                passageiro.passageirosVoosCadastrados.add(voo);
-                passageiro.passagensDoPassageiro.add(passagem);
-                System.out.println("passageiro " + passageiro.getNomePassageiro() + " registrado no voo " + voo.getNumeroVoo() + " com destino a " + voo.getDestinoVoo());
             }
-        } catch (PassageiroNaoEncontradoException | VooNaoEncontradoException e) {
+        } catch (PassageiroNaoEncontradoException | VooNaoEncontradoException | VagasIndisponiveisException | NumeroPassagemDuplicadoException e) {
             System.out.println(e.getMessage());
         } catch (java.util.InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
@@ -540,10 +552,10 @@ public class Aeroporto {
                 input.nextLine();
 
                 System.out.print("qual o numero do passaporte?");
-                String numPassaporte = input.nextLine();
+                String numPassaporte = input.nextLine().trim();
 
                 Passageiros passageiro = passageirosCadastrados.values().stream()
-                        .filter(a -> a.getNumeroPassaporte().equalsIgnoreCase(numPassaporte))
+                        .filter(a -> a.getNumeroPassaporte().trim().equalsIgnoreCase(numPassaporte))
                         .findFirst()
                         .orElseThrow(() -> new PassageiroNaoEncontradoException("não foi possivel realizar embarque pois nenhum passageiro foi encontrado com esse numero de passaporte"));
 
@@ -555,6 +567,7 @@ public class Aeroporto {
                         .orElseThrow(() -> new PassagemNaoEncontradaException("não foi possivel realizar embarque pois o numero da passagem não foi encontrado |OU| o voo ja não esta mais embarcando |OU| o numero da passagem fornecida não corresponde ao passageiro fornecido"));
 
                 passagem.getVooPassagem().passageirosNoVoo.put(passagem.getNumeroPassagem(), passagem);
+                System.out.println("check-in realizado pelo passageiro " + passageiro.getNomePassageiro() + " no voo " + passagem.getVooPassagem().getNumeroVoo()+ " com destino a " +passagem.getVooPassagem().getDestinoVoo());
             }
         } catch (PassagemNaoEncontradaException | PassageiroNaoEncontradoException e) {
             System.out.println(e.getMessage());
@@ -570,10 +583,10 @@ public class Aeroporto {
                 System.out.println("não foi possivel consultar voos, pois não há nenhum passageiro cadastrado");
             } else {
                 System.out.print("qual o numero do seu passaporte?");
-                String numPassaporte = input.nextLine();
+                String numPassaporte = input.nextLine().trim();
 
                 Passageiros passageiro = passageirosCadastrados.values().stream()
-                        .filter(a -> a.getNumeroPassaporte().equalsIgnoreCase(numPassaporte))
+                        .filter(a -> a.getNumeroPassaporte().trim().equalsIgnoreCase(numPassaporte))
                         .findFirst()
                         .orElseThrow(() -> new PassaporteNaoEncontradoException("não foi possivel consultar seus voos, pois seu passaporte não foi encontrado no sistema"));
 
@@ -598,12 +611,13 @@ public class Aeroporto {
                         break;
                     case 2:
                         System.out.println("se vc deseja consultar seus voos corretamente, por favor tente realizar a operação novamente");
+                        input.nextLine();
                         break;
                     default:
                         System.out.println("opcao invalida, por favor digite novamente");
                 }
             }
-        } catch (PassaporteInvalidoException e) {
+        } catch (PassaporteNaoEncontradoException e) {
             System.out.println(e.getMessage());
         } catch (java.util.InputMismatchException e) {
             System.out.println("entrada invalida, pir favor digite novamente");
@@ -645,6 +659,7 @@ public class Aeroporto {
                         break;
                     case 2:
                         System.out.println("se você deseja listar os passageiros de um outro voo, por favor tente inserir novamente");
+                        input.nextLine();
                         break;
                     default:
                         System.out.println("opção invalida, por favor digite novamente");
@@ -666,6 +681,8 @@ public class Aeroporto {
                 System.out.print("qual o cpf do passageiro?");
                 String cpf = input.nextLine();
 
+                input.nextLine();
+
                 Passageiros passageiros = passageirosCadastrados.values().stream()
                         .filter(a -> a.getCpfPassageiro().equalsIgnoreCase(cpf))
                         .findFirst()
@@ -684,7 +701,7 @@ public class Aeroporto {
                         if (passageiros.passageirosVoosCadastrados.isEmpty()) {
                             System.out.println("esse passageiro não foi registrado em nenhum voo");
                         } else {
-                            System.out.println("===== VOOS DO PASSAGEIRO " +passageiros.getCpfPassageiro().toUpperCase()+ " =====");
+                            System.out.println("===== VOOS DO PASSAGEIRO " + passageiros.getCpfPassageiro().toUpperCase() + " =====");
                             for (Voo voo : passageiros.passageirosVoosCadastrados) {
                                 voo.exibirDetalhesVoo();
                             }
@@ -705,3 +722,5 @@ public class Aeroporto {
         }
     }
 }
+
+

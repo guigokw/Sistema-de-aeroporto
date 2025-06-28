@@ -31,6 +31,7 @@ public class Main {
                         if (voo.getStatusVoo() != StatusVoo.FINALIZADO) {
                             voo.setStatusVoo(StatusVoo.FINALIZADO);
                             voo.passageirosNoVoo.clear();
+                            voo.passageirosCheckIn.clear();
                         }
                     }
                 }
@@ -49,7 +50,7 @@ public class Main {
 
         while (true) {
             try {
-                System.out.println("===== SISTEMA DO AEROPORTO =====");
+                System.out.println("===== SISTEMA DO AEROPORTO DE VITORIA =====");
                 System.out.println("[1] - MENU ADMINISTRATIVO");
                 System.out.println("[2] - MENU DO PASSAGEIRO");
                 System.out.println("[3] - MENU DE RELATORIOS E CONSULTAS");
@@ -126,10 +127,12 @@ public class Main {
                 System.out.print("qual dessa operações vc deseja realizar?");
                 int opcao = input.nextInt();
 
+                input.nextLine();
+
                 switch (opcao) {
-                    case 1 -> aeroporto.realizarCheckIn();
-                    case 2 -> aeroporto.realizarEmbarque();
-                    case 3 -> aeroporto.consultarSeusVoos();
+                    case 1 -> aeroporto.realizarCheckIn(); // confere
+                    case 2 -> aeroporto.realizarEmbarque(); // confere
+                    case 3 -> aeroporto.consultarSeusVoos(); // confere
                     case 4 -> {
                         System.out.println("saindo do menu do passageiro?");
                         return;
@@ -156,6 +159,8 @@ public class Main {
                 System.out.println("--------------------");
                 System.out.print("qual dessas operações você deseja seguir?");
                 int opcao = input.nextInt();
+
+                input.nextLine();
 
                 switch (opcao) {
                     case 1 -> aeroporto.listarVooPorCaracteristica();

@@ -12,6 +12,7 @@ public class Voo {
     private Aeronave aeronaveAssociada;
 
     Map<Integer, Passagem> passageirosNoVoo = new LinkedHashMap<>();
+    Map<Integer, Passagem> passageirosCheckIn = new HashMap<>();
     Scanner input = new Scanner(System.in);
 
     public Voo(int numeroVoo, String origemVoo, Localidade destinoVoo, LocalDateTime dataHorarioPartida, LocalDateTime dataHorarioChegada, StatusVoo statusVoo, Aeronave aeronaveAssociada) throws IllegalArgumentException {
@@ -177,21 +178,6 @@ public class Voo {
                 System.out.println("opcao invalida, por favor tente novamente");
         }
     }
-
-    public void verificarDisponibilidadeAssento(Voo voo) throws VooNaoEncontradoException, VagasIndisponiveisException {
-        long total = voo.passageirosNoVoo.values().size();
-
-        long assentosTotais = voo.aeronaveAssociada.getCapacidadeMaxima();
-        long assentosRestantes = assentosTotais - total;
-
-        if (assentosRestantes > 0) {
-            System.out.println("ainda há " +assentosRestantes+ " assentos restantes no voo " +voo.getNumeroVoo());
-        } else {
-            throw new VagasIndisponiveisException("não há mais vagas no voo " +voo.getNumeroVoo());
-        }
-
-    }
-
 
     public void exibirDetalhesVoo() {
         System.out.println("NUMERO DO VOO: " +this.numeroVoo);

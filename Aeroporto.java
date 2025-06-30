@@ -1,6 +1,7 @@
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -43,7 +44,7 @@ public class Aeroporto {
         } catch (NumeroRegistroDuplicadoException | IllegalArgumentException | NumeroRegistroInvalidoException |
                  CapacidadeMaximaInvalida e) {
             System.out.println(e.getMessage());
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
             input.nextLine();
         }
@@ -68,7 +69,7 @@ public class Aeroporto {
             }
         } catch (AeronaveNaoEncontradaException e) {
             System.out.println(e.getMessage());
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
             input.nextLine();
         }
@@ -157,7 +158,7 @@ public class Aeroporto {
             System.out.println(e.getMessage());
         } catch (DateTimeParseException e) {
             System.out.println("não foi possivel cadastrar voo, pois o formato de data esta incorreto");
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
             input.nextLine();
         }
@@ -180,7 +181,7 @@ public class Aeroporto {
             }
         } catch (VooNaoEncontradoException | IllegalArgumentException e) {
             System.out.println(e.getMessage());
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
             input.nextLine();
         }
@@ -203,7 +204,7 @@ public class Aeroporto {
             }
         } catch (VooNaoEncontradoException e) {
             System.out.println(e.getMessage());
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
             input.nextLine();
         }
@@ -236,58 +237,28 @@ public class Aeroporto {
                         System.out.print("qual desses status de voo vc deseja listar os voos?");
                         int opcao2 = input.nextInt();
 
-                        if (opcao2 == 1) {
-                            Voo voo = voosDoAeroporto.values().stream()
-                                    .filter(a -> a.getStatusVoo() == StatusVoo.AGENDADO)
-                                    .findAny()
-                                    .orElseThrow(() -> new VooNaoEncontradoException("não foi possivel listar voos agendados, pois não há nenhum"));
+                        StatusVoo statusVoo = switch (opcao2) {
+                            case 1 -> StatusVoo.AGENDADO;
+                            case 2 -> StatusVoo.EMBARCANDO;
+                            case 3 -> StatusVoo.EM_VOO;
+                            case 4 -> StatusVoo.ATRASADO;
+                            case 5 -> StatusVoo.CANCELADO;
+                            case 6 -> StatusVoo.FINALIZADO;
+                            default -> throw new IllegalArgumentException("opção invalida, por favor tente novamente");
+                        };
+                           List<Voo> voo = voosDoAeroporto.values().stream()
+                                    .filter(a -> a.getStatusVoo() == statusVoo)
+                                    .toList();
 
-                            System.out.println("===== DETALHES DOS VOO AGENDADO ======");
-                            voo.exibirDetalhesVoo();
-                        } else if (opcao2 == 2) {
-                            Voo voo = voosDoAeroporto.values().stream()
-                                    .filter(a -> a.getStatusVoo() == StatusVoo.EMBARCANDO)
-                                    .findAny()
-                                    .orElseThrow(() -> new VooNaoEncontradoException("nao foi possivel listar os voos embarcando pois não há nenhum"));
-
-                            System.out.println("===== DETALHES DOS VOOS EMBARCANDO ======");
-                            voo.exibirDetalhesVoo();
-                        } else if (opcao2 == 3) {
-                            Voo voo = voosDoAeroporto.values().stream()
-                                    .filter(a -> a.getStatusVoo() == StatusVoo.EM_VOO)
-                                    .findAny()
-                                    .orElseThrow(() -> new VooNaoEncontradoException("não foi possivel listar os voos em voo pois nenhum foi encontrado"));
-
-                            System.out.println("===== DETALHES DOS VOOS EM VOO =====");
-                            voo.exibirDetalhesVoo();
-                        } else if (opcao2 == 4) {
-                            Voo voo = voosDoAeroporto.values().stream()
-                                    .filter(a -> a.getStatusVoo() == StatusVoo.ATRASADO)
-                                    .findAny()
-                                    .orElseThrow(() -> new VooNaoEncontradoException("não foi possivel listar os voos atrasados pois nenhum foi registrado"));
-
-                            System.out.println("===== DETALHES DOS VOOS ATRASADOS ======");
-                            voo.exibirDetalhesVoo();
-                        } else if (opcao2 == 5) {
-                            Voo voo = voosDoAeroporto.values().stream()
-                                    .filter(a -> a.getStatusVoo() == StatusVoo.CANCELADO)
-                                    .findAny()
-                                    .orElseThrow(() -> new VooNaoEncontradoException("não foi possivel listar os voos cancelados, pois nenhum foi registrado"));
-
-                            System.out.println("====== DETALHES DOS VOOS CANCELADOS ======");
-                            voo.exibirDetalhesVoo();
-                        } else if (opcao2 == 6) {
-                            Voo voo = voosDoAeroporto.values().stream()
-                                    .filter(a -> a.getStatusVoo() == StatusVoo.FINALIZADO)
-                                    .findAny()
-                                    .orElseThrow(() -> new VooNaoEncontradoException("não foi possivel listar os voos finalizados, pois nenhum foi registrado"));
-
-                            System.out.println("====== DETALHES DOS VOOS FINALIZADOS ======");
-                            voo.exibirDetalhesVoo();
-                        } else {
-                            System.out.println("opcao invalida, por favor digite novamente");
-                        }
-                        break;
+                           if (voo.isEmpty()) {
+                               throw new VooNaoEncontradoException("não foi possivel listar voos " +statusVoo+ ", pois não há nenhum registrado");
+                           } else {
+                               System.out.println("===== DETALHES DOS VOOS " +statusVoo+ " ======");
+                               for (Voo voos : voo) {
+                                   voos.exibirDetalhesVoo();
+                               }
+                           }
+                           break;
                     case 2:
                         System.out.println("1 - são paulo");
                         System.out.println("2 - rio de janeiro");
@@ -306,29 +277,40 @@ public class Aeroporto {
                             default -> throw new IllegalArgumentException("opcao invalida, por favor digite novamente");
                         };
 
-                        Voo voo2 = voosDoAeroporto.values().stream()
+                        List<Voo> voo2 = voosDoAeroporto.values().stream()
                                 .filter(a -> a.getDestinoVoo() == local)
-                                .findAny()
-                                .orElseThrow(() -> new VooNaoEncontradoException("não foi possivel listar os voos com destino " + local + " pois nenhum foi encontrado"));
+                                .toList();
 
-                        System.out.println("====== DETALHES DOS VOOS COM DESTINO DE " + local + " =====");
-                        voo2.exibirDetalhesVoo();
+                        if (voo2.isEmpty()) {
+                        throw new VooNaoEncontradoException("não foi possivel listar os voos com destino " + local + " pois nenhum foi encontrado");
+                        } else {
+                            System.out.println("====== DETALHES DOS VOOS COM DESTINO DE " + local + " =====");
+                            for (Voo voos : voo2) {
+                                voos.exibirDetalhesVoo();
+                            }
+                        }
                         break;
                     case 3:
                         System.out.print("qual a data dos voos que vc deseja listar");
                         String dataVoo = input.nextLine().trim();
 
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                        LocalDateTime dataConvertida = LocalDateTime.parse(dataVoo, formatter);
+                        LocalDate dataConvertida = LocalDate.parse(dataVoo, formatter);
 
-                        Voo voo3 = voosDoAeroporto.values().stream()
-                                .filter(a -> a.getDataHorarioChegada().equals(dataConvertida))
-                                .filter(b -> b.getDataHorarioPartida().equals(dataConvertida))
-                                .findAny()
-                                .orElseThrow(() -> new VooNaoEncontradoException("não foi posivel listar os voos do dia " + dataConvertida + " pois nenhuma foi registrada"));
+                        List<Voo> voo3 = voosDoAeroporto.values().stream()
+                                .filter(a -> a.getDataHorarioChegada().toLocalDate().isEqual(ChronoLocalDate.from(dataConvertida)))
+                                .filter(b -> b.getDataHorarioPartida().toLocalDate().isEqual(ChronoLocalDate.from(dataConvertida)))
+                                .toList();
 
-                        System.out.println("===== DETALHES DOS VOOS DO DIA " + dataConvertida + " ======");
-                        voo3.exibirDetalhesVoo();
+
+                        if (voo3.isEmpty()) {
+                           throw new VooNaoEncontradoException("não foi posivel listar os voos do dia " + dataConvertida + " pois nenhuma foi registrada");
+                        } else {
+                            System.out.println("===== DETALHES DOS VOOS DO DIA " + dataConvertida + " ======");
+                            for (Voo voos : voo3) {
+                                voos.exibirDetalhesVoo();
+                            }
+                        }
                         break;
                     default:
                         System.out.println("opcao invalida, por favor digite novamente");
@@ -336,7 +318,7 @@ public class Aeroporto {
             }
         } catch (VooNaoEncontradoException e) {
             System.out.println(e.getMessage());
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
             input.nextLine();
         } catch (DateTimeParseException e) {
@@ -369,7 +351,7 @@ public class Aeroporto {
         } catch (CpfDuplicadoException | IllegalArgumentException | CpfInvalidoException |
                  PassaporteInvalidoException e) {
             System.out.println(e.getMessage());
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
             input.nextLine();
         }
@@ -414,7 +396,7 @@ public class Aeroporto {
             }
         } catch (PassageiroNaoEncontradoException e) {
             System.out.println(e.getMessage());
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
             input.nextLine();
         }
@@ -425,8 +407,10 @@ public class Aeroporto {
             if (passageirosCadastrados.isEmpty()) {
                 System.out.println("não foi possivel consultar as informações de um passageiro pois nenhum foi encontrado");
             } else {
-                System.out.print("qual o cpf do passageiro que vc deseja consultar infromacoes?");
-                String cpf = input.nextLine();
+                System.out.print("qual o cpf do passageiro que vc deseja consultar informacoes?");
+                String cpf = input.nextLine().trim();
+
+                input.nextLine();
 
                 Passageiros passageiro = passageirosCadastrados.values().stream()
                         .filter(a -> a.getCpfPassageiro().equalsIgnoreCase(cpf))
@@ -438,13 +422,11 @@ public class Aeroporto {
             }
         } catch (PassageiroNaoEncontradoException e) {
             System.out.println(e.getMessage());
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
             input.nextLine();
         }
     }
-
-    // MENU DE PASSAGEIRO
 
     public void realizarCheckIn() throws PassageiroNaoEncontradoException, VooNaoEncontradoException, VagasIndisponiveisException {
         try {
@@ -534,7 +516,7 @@ public class Aeroporto {
             }
         } catch (PassageiroNaoEncontradoException | VooNaoEncontradoException | VagasIndisponiveisException | NumeroPassagemDuplicadoException e) {
             System.out.println(e.getMessage());
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
             input.nextLine();
         }
@@ -571,7 +553,7 @@ public class Aeroporto {
             }
         } catch (PassagemNaoEncontradaException | PassageiroNaoEncontradoException e) {
             System.out.println(e.getMessage());
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
             input.nextLine();
         }
@@ -584,6 +566,8 @@ public class Aeroporto {
             } else {
                 System.out.print("qual o numero do seu passaporte?");
                 String numPassaporte = input.nextLine().trim();
+
+                input.nextLine();
 
                 Passageiros passageiro = passageirosCadastrados.values().stream()
                         .filter(a -> a.getNumeroPassaporte().trim().equalsIgnoreCase(numPassaporte))
@@ -619,7 +603,7 @@ public class Aeroporto {
             }
         } catch (PassaporteNaoEncontradoException e) {
             System.out.println(e.getMessage());
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, pir favor digite novamente");
             input.nextLine();
         }
@@ -630,7 +614,7 @@ public class Aeroporto {
             if (voosDoAeroporto.isEmpty()) {
                 System.out.println("não foi possivel listar passageiros de um voo, pois nenhum voo foi registrado no sistema");
             } else {
-                System.out.print("qual o numero do voo que você desejalistar os passageiros?");
+                System.out.print("qual o numero do voo que você deseja listar os passageiros?");
                 int numVoo = input.nextInt();
 
                 Voo voo = voosDoAeroporto.values().stream()
@@ -667,7 +651,7 @@ public class Aeroporto {
             }
         } catch (VooNaoEncontradoException e) {
             System.out.println(e.getMessage());
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, po favor digite novamente");
             input.nextLine();
         }
@@ -679,12 +663,12 @@ public class Aeroporto {
                 System.out.println("não foi possivel listar os voos de um passageiro, pois nenhum passageiro foi registrado no sistema");
             } else {
                 System.out.print("qual o cpf do passageiro?");
-                String cpf = input.nextLine();
+                String cpf = input.nextLine().trim();
 
                 input.nextLine();
 
                 Passageiros passageiros = passageirosCadastrados.values().stream()
-                        .filter(a -> a.getCpfPassageiro().equalsIgnoreCase(cpf))
+                        .filter(a -> a.getCpfPassageiro().trim().equalsIgnoreCase(cpf))
                         .findFirst()
                         .orElseThrow(() -> new PassageiroNaoEncontradoException("não foi possivel listar os voos de passageiro, pois nenhum passageiro com esse cpf foi encontrado"));
 
@@ -714,7 +698,7 @@ public class Aeroporto {
                         System.out.println("opcao invalida, por favor digite novamente");
                 }
             }
-        } catch (java.util.InputMismatchException e) {
+        } catch (InputMismatchException e) {
             System.out.println("entrada invalida, por favor digite novamente");
             input.nextLine();
         } catch (PassageiroNaoEncontradoException e) {

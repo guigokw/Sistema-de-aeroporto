@@ -95,13 +95,13 @@ public class Main {
                 int opcao = input.nextInt();
 
                 switch (opcao) {
-                    case 1 -> aeroporto.cadastrarAeronaveAeroporto(); // confere
-                    case 2 -> aeroporto.removerAeronaveAeroporto(); // confere
-                    case 3 -> aeroporto.cadastrarVooAeroporto(); // confere
-                    case 4 -> aeroporto.cancelarVooAeroporto(); // confere
-                    case 5 -> aeroporto.cadastrarPassageirosAeroporto(); // confere
-                    case 6 -> aeroporto.removerPassageiroAeroporto(); // confere
-                    case 7 -> aeroporto.alterarStatusVooAeroporto(); // confere
+                    case 1 -> aeroporto.cadastrarAeronaveAeroporto(); 
+                    case 2 -> aeroporto.removerAeronaveAeroporto();
+                    case 3 -> aeroporto.cadastrarVooAeroporto();
+                    case 4 -> aeroporto.cancelarVooAeroporto();
+                    case 5 -> aeroporto.cadastrarPassageirosAeroporto();
+                    case 6 -> aeroporto.removerPassageiroAeroporto();
+                    case 7 -> aeroporto.alterarStatusVooAeroporto();
                     case 8 -> {
                         System.out.println("saindo do menu administrativo....");
                         return;
@@ -130,9 +130,9 @@ public class Main {
                 input.nextLine();
 
                 switch (opcao) {
-                    case 1 -> aeroporto.realizarCheckIn(); // confere
-                    case 2 -> aeroporto.realizarEmbarque(); // confere
-                    case 3 -> aeroporto.consultarSeusVoos(); // confere
+                    case 1 -> aeroporto.realizarCheckIn();
+                    case 2 -> aeroporto.realizarEmbarque();
+                    case 3 -> aeroporto.consultarSeusVoos();
                     case 4 -> {
                         System.out.println("saindo do menu do passageiro?");
                         return;
@@ -151,10 +151,10 @@ public class Main {
             try {
                 System.out.println("===== SISTEMA DE RELATORIOS E CONSULTAS =====");
                 System.out.println("[1] - listar voos por alguma caracteristica");
-                System.out.println("[2] - listar aeronaves");
-                System.out.println("[3] - listar passageiros de um voo");
+                System.out.println("[2] - listar aeronaves"); // confere
+                System.out.println("[3] - listar passageiros de um voo"); // confere
                 System.out.println("[4] - mostrar historico de voos de um passageiro");
-                System.out.println("[5] - listar passageiros cadastrados no aeroporto");
+                System.out.println("[5] - consultar informações de um passageiro");
                 System.out.println("[6] - sair do menu de relatorios e consultas");
                 System.out.println("--------------------");
                 System.out.print("qual dessas operações você deseja seguir?");

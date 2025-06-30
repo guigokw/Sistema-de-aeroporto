@@ -95,7 +95,7 @@ public class Main {
                 int opcao = input.nextInt();
 
                 switch (opcao) {
-                    case 1 -> aeroporto.cadastrarAeronaveAeroporto(); 
+                    case 1 -> aeroporto.cadastrarAeronaveAeroporto();
                     case 2 -> aeroporto.removerAeronaveAeroporto();
                     case 3 -> aeroporto.cadastrarVooAeroporto();
                     case 4 -> aeroporto.cancelarVooAeroporto();

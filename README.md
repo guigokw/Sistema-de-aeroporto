@@ -6,7 +6,6 @@ verificação complexa, com foco na integridade dos dados e na interação com o
 ---
 
 ## Indice
--
 - [📌 sobre o projeto](#-sobre-o-projeto)
 - [💡 funcionalidades](#-funcionalidades)
 - [🔎 tecnologias utilizadas](#-tecnologias-utilizadas)

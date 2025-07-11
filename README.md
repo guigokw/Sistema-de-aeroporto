@@ -1,4 +1,4 @@
-# Sistema de gestão de aeroporto
+# ✈️ Sistema de gestão de aeroporto
 
 Sistema feito em java para gerenciar voos de um aeroporto, permetindo o registro de passageiros, o calculo do preço da passagem, verificação em tempo real das horas para alterar status de voo e
 verificação complexa, com foco na integridade dos dados e na interação com o usuario
@@ -7,16 +7,16 @@ verificação complexa, com foco na integridade dos dados e na interação com o
 
 ## Indice
 -
-- [ sobre o projeto](#-sobre-o-projeto)
-- [ funcionalidades](#-funcionalidades)
-- [ tecnologias utilizadas](#-tecnologias-utilizadas)
-- [ como executar](#-como-executar)
-- [ contribuição](#-contribuição)
-- [ licença](#-licença)
+- [📌 sobre o projeto](#-sobre-o-projeto)
+- [💡 funcionalidades](#-funcionalidades)
+- [🔎 tecnologias utilizadas](#-tecnologias-utilizadas)
+- [⚙️ como executar](#-como-executar)
+- [🙌 contribuição](#-contribuição)
+- [🧾 licença](#-licença)
 
  ---
 
-## sobre o projeto
+## 📌 sobre o projeto
 
 esse sistema foi feito com o objetivo de aprimorar meus estudos em java com base em aplicações que sejam importantes em sistemas reais, este projeto foi focado em fazer um sistema de aeroporto que relacionasse corretamente os dados como quais passageiros em quais voos cadastrados, focando com uma interação de usuario sendo essa feita pelo funcionario com foco em metodos administrativos como cadastrar uma aeronave ou cancelar um voo, e métodos do cliente como realizar check-in e embarcar no voo
 
@@ -24,7 +24,7 @@ esse sistema tem como foco tambem evitar inconsistencias como um passageiro faze
 
 ---
 
-## funcionalidades
+## 💡 funcionalidades
 - cadastro de passageiros, aeronaves, voos e etc
 - verificação em tempo real dos horarios dos voos
 - calculos de preço de passagem
@@ -34,7 +34,7 @@ esse sistema tem como foco tambem evitar inconsistencias como um passageiro faze
  
  ---
 
- ## tecnologias_utilizadas
+ ## 🔎 tecnologias_utilizadas
  - **java 17+**
  - **orientação a objetos**
  - **coleções(list, map, set, stream API)**
@@ -44,7 +44,7 @@ esse sistema tem como foco tambem evitar inconsistencias como um passageiro faze
 
 ---
 
-## como executar
+## ⚙️ como executar
 1. **Clone o repositório:**
    ```bash
    git clone https://github.com/guigokw/sistema-de-aeroporto.git
